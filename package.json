@@ -1,0 +1,23 @@
+{
+  "name": "byt3d",
+  "private": true,
+  "version": "0.0.0",
+  "description": "BYT 3D — 3D printing business management monorepo",
+  "scripts": {
+    "dev": "pnpm --filter @byt3d/web dev",
+    "build": "pnpm --filter @byt3d/types build && pnpm --filter @byt3d/web build",
+    "test": "pnpm -r test",
+    "test:types": "pnpm --filter @byt3d/types test",
+    "test:web": "pnpm --filter @byt3d/web test",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "clean": "pnpm -r clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  }
+}
