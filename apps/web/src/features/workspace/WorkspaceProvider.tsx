@@ -57,7 +57,6 @@ export function WorkspaceProvider({ children }: WorkspaceProviderProps) {
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useWorkspaceContext(): WorkspaceContextValue {
   const ctx = useContext(WorkspaceContext);
   if (!ctx) {

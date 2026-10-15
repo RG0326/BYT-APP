@@ -1,5 +1,4 @@
 import { Outlet } from 'react-router-dom';
-import { WorkspaceProvider } from '@/features/workspace/WorkspaceProvider';
 
 /**
  * RootLayout — wraps all authenticated routes.

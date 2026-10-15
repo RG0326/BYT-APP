@@ -19,7 +19,11 @@ export const CurrencyCodeSchema = z.enum(['EUR']);
 export type CurrencyCode = z.infer<typeof CurrencyCodeSchema>;
 
 export const MoneySchema = z.object({
-  amount_minor: z.number().int().describe('Amount in minor currency units (e.g. cents). Never float.'),
+  amount_minor: z
+    .number()
+    .int()
+    .safe()
+    .describe('Amount in minor currency units (e.g. cents). Never float.'),
   currency: CurrencyCodeSchema,
 });
 export type Money = z.infer<typeof MoneySchema>;
@@ -36,10 +40,25 @@ export function formatMoney(money: Money): string {
   });
 }
 
-/** Parse a decimal string to minor units (e.g. "12.50" → 1250) */
+/** Parse a decimal string to minor units (e.g. "12.50" → 1250). */
 export function parseMoney(decimalStr: string, currency: CurrencyCode = 'EUR'): Money {
-  const amount = Math.round(parseFloat(decimalStr) * 100);
-  return { amount_minor: amount, currency };
+  const normalized = decimalStr.trim();
+  if (!/^[+-]?\d+(?:\.\d{1,2})?$/.test(normalized)) {
+    throw new Error('Invalid monetary amount');
+  }
+
+  const sign = normalized.startsWith('-') ? -1n : 1n;
+  const unsigned = /^[+-]/.test(normalized) ? normalized.slice(1) : normalized;
+  const [wholePart = '0', fractionalPart = ''] = unsigned.split('.');
+  const amountMinor =
+    sign * (BigInt(wholePart) * 100n + BigInt(fractionalPart.padEnd(2, '0') || '0'));
+  const safeLimit = BigInt(Number.MAX_SAFE_INTEGER);
+
+  if (amountMinor > safeLimit || amountMinor < -safeLimit) {
+    throw new Error('Monetary amount is out of range');
+  }
+
+  return MoneySchema.parse({ amount_minor: Number(amountMinor), currency });
 }
 
 // ---------------------------------------------------------------------------
